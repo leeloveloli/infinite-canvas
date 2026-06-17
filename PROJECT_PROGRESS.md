@@ -21,16 +21,17 @@
 
 ### Current Status
 
-- Latest Vercel deployment build output is ready, but the deployment state is `BLOCKED`.
-- Vercel project protection currently reports SSO protection for `all_except_custom_domains`, so the default `vercel.app` URL returns 401.
+- Latest Vercel production deployment is `READY`.
+- Vercel project Root Directory is set to `web`.
+- Vercel project protection currently reports SSO protection for `all_except_custom_domains`, so the `infinite-canvas-*.vercel.app` URLs return 401.
+- Public alias verified with HTTP 200 and title `无限画布`: `https://web-eight-tan-84.vercel.app`.
 - Production alias recorded by Vercel: `https://infinite-canvas-lees-projects-3102547c.vercel.app`.
 
 ### Remaining Issues
 
 - Decide whether to disable or adjust Vercel Deployment Protection for this project, or attach a custom domain.
-- Confirm Vercel Git deployments use `web` as the root directory. If automatic Git builds fail from the repository root, set Root Directory to `web` in Vercel project settings.
 
 ### Next Steps
 
 - If public access through `vercel.app` is required, explicitly confirm changing Vercel Deployment Protection.
-- After protection/root settings are confirmed, trigger a fresh production deployment from Vercel or via CLI.
+- Use the verified public alias for testing, or attach a preferred custom domain.
