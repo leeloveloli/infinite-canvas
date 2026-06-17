@@ -1,13 +1,15 @@
 import type { NextConfig } from "next";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { parseChangelog } from "@/lib/release";
 
 const webDir = dirname(fileURLToPath(import.meta.url));
-const localVersion = readFileSync(resolve(webDir, "../VERSION"), "utf8").trim() || "dev";
-const localChangelog = readFileSync(resolve(webDir, "../CHANGELOG.md"), "utf8");
+const readOptionalFile = (filePath: string, fallback: string) => (existsSync(filePath) ? readFileSync(filePath, "utf8") : fallback);
+
+const localVersion = readOptionalFile(resolve(webDir, "../VERSION"), "dev").trim() || "dev";
+const localChangelog = readOptionalFile(resolve(webDir, "../CHANGELOG.md"), "");
 
 export default function nextConfig(phase: string): NextConfig {
     const isDev = phase === PHASE_DEVELOPMENT_SERVER;
