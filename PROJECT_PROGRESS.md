@@ -17,6 +17,7 @@
 - Added AI channel request mode support: `前端直连` and `Next.js 转发`.
 - Added `/api/ai-proxy` to forward OpenAI-compatible model, image, text, audio and video requests through the deployed Next.js app.
 - Verified local `/api/ai-proxy` can fetch the Saki model list with HTTP 200.
+- Adjusted proxy-mode browser requests to send the upstream key as `X-AI-Authorization`; the Next.js proxy converts it back to `Authorization` before calling the upstream API. This avoids Vercel Deployment Protection treating the upstream key as a Vercel auth header.
 
 ### Key Decisions
 

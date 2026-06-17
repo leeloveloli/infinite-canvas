@@ -12,7 +12,7 @@ function aiApiUrl(config: AiConfig, path: string) {
 
 function aiHeaders(config: AiConfig) {
     return {
-        Authorization: `Bearer ${config.apiKey}`,
+        [config.proxyMode === "nextjs" ? "X-AI-Authorization" : "Authorization"]: `Bearer ${config.apiKey}`,
         "Content-Type": "application/json",
     };
 }

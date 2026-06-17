@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const AI_PROXY_TIMEOUT_MS = 300000;
-const REQUEST_HEADERS = ["authorization", "content-type", "accept", "openai-beta"];
+const REQUEST_HEADERS = ["content-type", "accept", "openai-beta"];
 const RESPONSE_HEADERS = ["content-type", "content-disposition", "cache-control"];
 
 export async function GET(request: NextRequest) {
@@ -38,6 +38,8 @@ async function proxyAiRequest(request: NextRequest) {
     if (url.protocol !== "http:" && url.protocol !== "https:") return new Response("Unsupported AI proxy target", { status: 400 });
 
     const headers = new Headers();
+    const authorization = request.headers.get("x-ai-authorization") || request.headers.get("authorization");
+    if (authorization) headers.set("Authorization", authorization);
     REQUEST_HEADERS.forEach((key) => {
         const value = request.headers.get(key);
         if (value) headers.set(key, value);

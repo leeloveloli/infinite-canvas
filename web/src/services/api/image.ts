@@ -215,7 +215,7 @@ function aiApiUrl(config: AiConfig, path: string) {
 
 function aiHeaders(config: AiConfig, contentType?: string) {
     return {
-        Authorization: `Bearer ${config.apiKey}`,
+        [config.proxyMode === "nextjs" ? "X-AI-Authorization" : "Authorization"]: `Bearer ${config.apiKey}`,
         ...(contentType ? { "Content-Type": contentType } : {}),
     };
 }
@@ -463,7 +463,7 @@ export async function fetchImageModels(config: Pick<AiConfig, "baseUrl" | "apiKe
     try {
         const response = await axios.get<{ data?: Array<{ id?: string }>; error?: { message?: string } }>(buildRequestUrl(config, "/models"), {
             headers: {
-                Authorization: `Bearer ${config.apiKey}`,
+                [config.proxyMode === "nextjs" ? "X-AI-Authorization" : "Authorization"]: `Bearer ${config.apiKey}`,
             },
         });
         return (response.data.data || [])
