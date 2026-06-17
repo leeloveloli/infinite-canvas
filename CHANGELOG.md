@@ -2,6 +2,8 @@
 
 ## Unreleased
 
++ [新增] AI 渠道支持通过 Next.js 转发请求，兼容不支持浏览器 CORS 的 OpenAI 兼容接口。
+
 ## v0.4.0 - 2026-06-16
 
 + [新增] 新增网页版Agent Loop模式。

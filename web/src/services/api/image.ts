@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { buildApiUrl, resolveModelRequestConfig, type AiConfig, type ModelChannel } from "@/stores/use-config-store";
+import { buildRequestUrl, resolveModelRequestConfig, type AiConfig, type ModelChannel } from "@/stores/use-config-store";
 import { nanoid } from "nanoid";
 import { dataUrlToFile } from "@/lib/image-utils";
 import { buildImageReferencePromptText } from "@/lib/image-reference-prompt";
@@ -210,7 +210,7 @@ function withSystemPrompt(config: AiConfig, prompt: string) {
 }
 
 function aiApiUrl(config: AiConfig, path: string) {
-    return buildApiUrl(config.baseUrl, path);
+    return buildRequestUrl(config, path);
 }
 
 function aiHeaders(config: AiConfig, contentType?: string) {
@@ -459,9 +459,9 @@ export async function requestToolResponse(config: AiConfig, messages: ResponseIn
     }
 }
 
-export async function fetchImageModels(config: Pick<AiConfig, "baseUrl" | "apiKey">) {
+export async function fetchImageModels(config: Pick<AiConfig, "baseUrl" | "apiKey" | "proxyMode">) {
     try {
-        const response = await axios.get<{ data?: Array<{ id?: string }>; error?: { message?: string } }>(buildApiUrl(config.baseUrl, "/models"), {
+        const response = await axios.get<{ data?: Array<{ id?: string }>; error?: { message?: string } }>(buildRequestUrl(config, "/models"), {
             headers: {
                 Authorization: `Bearer ${config.apiKey}`,
             },

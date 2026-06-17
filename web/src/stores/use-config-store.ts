@@ -10,13 +10,17 @@ export type ModelChannel = {
     name: string;
     baseUrl: string;
     apiKey: string;
+    proxyMode: ApiProxyMode;
     models: string[];
 };
+
+export type ApiProxyMode = "direct" | "nextjs";
 
 export type AiConfig = {
     channelMode: "remote" | "local";
     baseUrl: string;
     apiKey: string;
+    proxyMode: ApiProxyMode;
     channels: ModelChannel[];
     model: string;
     imageModel: string;
@@ -60,12 +64,14 @@ export const defaultConfig: AiConfig = {
     channelMode: "local",
     baseUrl: "https://api.openai.com",
     apiKey: "",
+    proxyMode: "direct",
     channels: [
         {
             id: "default",
             name: "默认渠道",
             baseUrl: "https://api.openai.com",
             apiKey: "",
+            proxyMode: "direct",
             models: ["gpt-image-2", "grok-imagine-video", "gpt-5.5", "gpt-4o-mini-tts"],
         },
     ],
@@ -123,7 +129,20 @@ function isVideoModelName(model: string) {
 
 function isImageModelName(model: string) {
     const value = modelOptionName(model).toLowerCase();
-    return !isVideoModelName(model) && !isAudioModelName(model) && (value.includes("seedream") || value.includes("gpt-image") || value.includes("image") || value.includes("dall-e") || value.includes("dalle") || value.includes("imagen") || value.includes("flux") || value.includes("sdxl") || value.includes("stable-diffusion") || value.includes("midjourney"));
+    return (
+        !isVideoModelName(model) &&
+        !isAudioModelName(model) &&
+        (value.includes("seedream") ||
+            value.includes("gpt-image") ||
+            value.includes("image") ||
+            value.includes("dall-e") ||
+            value.includes("dalle") ||
+            value.includes("imagen") ||
+            value.includes("flux") ||
+            value.includes("sdxl") ||
+            value.includes("stable-diffusion") ||
+            value.includes("midjourney"))
+    );
 }
 
 function isAudioModelName(model: string) {
@@ -248,6 +267,7 @@ export function createModelChannel(channel?: Partial<ModelChannel>): ModelChanne
         name: channel?.name?.trim() || "新渠道",
         baseUrl: channel?.baseUrl?.trim() || "https://api.openai.com",
         apiKey: channel?.apiKey || "",
+        proxyMode: channel?.proxyMode === "nextjs" ? "nextjs" : "direct",
         models: uniqueRawModels(channel?.models || []),
     };
 }
@@ -307,6 +327,7 @@ export function resolveModelRequestConfig(config: AiConfig, value: string) {
         model: modelOptionName(value || config.model),
         baseUrl: channel.baseUrl,
         apiKey: channel.apiKey,
+        proxyMode: channel.proxyMode,
     };
 }
 
@@ -327,18 +348,12 @@ function normalizeChannels(config: AiConfig) {
                 name: "默认渠道",
                 baseUrl: config.baseUrl || defaultConfig.baseUrl,
                 apiKey: config.apiKey || "",
-                models: uniqueRawModels([
-                    ...(config.models || []),
-                    config.model,
-                    config.imageModel,
-                    config.videoModel,
-                    config.textModel,
-                    config.audioModel,
-                ]),
+                proxyMode: config.proxyMode || "direct",
+                models: uniqueRawModels([...(config.models || []), config.model, config.imageModel, config.videoModel, config.textModel, config.audioModel]),
             }),
         );
     }
-    return channels.map((channel) => ({ ...channel, models: uniqueRawModels(channel.models) }));
+    return channels.map((channel) => ({ ...channel, proxyMode: channel.proxyMode || config.proxyMode || "direct", models: uniqueRawModels(channel.models) }));
 }
 
 function uniqueRawModels(models: string[]) {
@@ -355,6 +370,11 @@ export function buildApiUrl(baseUrl: string, path: string) {
     const lowerBaseUrl = normalizedBaseUrl.toLowerCase();
     const apiBaseUrl = lowerBaseUrl.endsWith("/v1") || lowerBaseUrl.endsWith("/api/v3") || lowerBaseUrl.endsWith("/api/plan/v3") ? normalizedBaseUrl : `${normalizedBaseUrl}/v1`;
     return `${apiBaseUrl}${path}`;
+}
+
+export function buildRequestUrl(config: Pick<AiConfig, "baseUrl" | "proxyMode">, path: string) {
+    const target = buildApiUrl(config.baseUrl, path);
+    return config.proxyMode === "nextjs" ? `/api/ai-proxy?target=${encodeURIComponent(target)}` : target;
 }
 
 function normalizeArkPlanBaseUrl(baseUrl: string) {

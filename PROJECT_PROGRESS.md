@@ -12,12 +12,18 @@
 - Connected the Vercel project to `https://github.com/leeloveloli/infinite-canvas`.
 - Added a compatibility fix so `web/next.config.ts` can build when Vercel deploys only the `web` directory.
 - Built successfully with `vercel build --prod` and uploaded a production deployment.
+- Verified `https://api.saki.lat/v1/models` works server-side with the provided OpenAI-compatible key; `https://api.saki.lat/models` returns 403.
+- Confirmed `api.saki.lat` does not return `Access-Control-Allow-Origin`, so browser direct model fetching and generation requests are blocked by CORS.
+- Added AI channel request mode support: `前端直连` and `Next.js 转发`.
+- Added `/api/ai-proxy` to forward OpenAI-compatible model, image, text, audio and video requests through the deployed Next.js app.
+- Verified local `/api/ai-proxy` can fetch the Saki model list with HTTP 200.
 
 ### Key Decisions
 
 - The app lives in `web`, so Vercel operations were run with `web` as the working directory.
 - README mentions a root `vercel.json`, but the current repository does not include one. Deployment was handled by linking the `web` app directly.
 - Vercel access protection was not disabled because it is a project security setting.
+- For APIs without browser CORS support, channels should use `Next.js 转发`.
 
 ### Current Status
 
@@ -35,3 +41,4 @@
 
 - If public access through `vercel.app` is required, explicitly confirm changing Vercel Deployment Protection.
 - Use the verified public alias for testing, or attach a preferred custom domain.
+- Configure the Saki channel with Base URL `https://api.saki.lat`, the provided key, and request mode `Next.js 转发`; then click `拉取模型`.

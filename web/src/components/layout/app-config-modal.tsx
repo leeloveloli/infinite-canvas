@@ -264,6 +264,17 @@ export function AppConfigModal() {
                                                 <Form.Item label="API Key" className="mb-0">
                                                     <Input.Password value={channel.apiKey} onChange={(event) => updateChannel(channel.id, { apiKey: event.target.value })} />
                                                 </Form.Item>
+                                                <Form.Item label="请求方式" className="mb-0">
+                                                    <Segmented
+                                                        block
+                                                        value={channel.proxyMode}
+                                                        onChange={(proxyMode) => updateChannel(channel.id, { proxyMode: proxyMode as ModelChannel["proxyMode"] })}
+                                                        options={[
+                                                            { label: "前端直连", value: "direct" },
+                                                            { label: "Next.js 转发", value: "nextjs" },
+                                                        ]}
+                                                    />
+                                                </Form.Item>
                                                 <Form.Item label="模型列表" className="mb-0">
                                                     <Select mode="tags" showSearch allowClear maxTagCount="responsive" placeholder="输入模型名，或点击拉取模型" value={channel.models} onChange={(models) => updateChannel(channel.id, { models })} />
                                                 </Form.Item>
@@ -425,6 +436,7 @@ function withChannels(config: AiConfig, channels: ModelChannel[]): AiConfig {
         models,
         baseUrl: channels[0]?.baseUrl || config.baseUrl,
         apiKey: channels[0]?.apiKey || config.apiKey,
+        proxyMode: channels[0]?.proxyMode || config.proxyMode,
         imageModels,
         videoModels,
         textModels,
